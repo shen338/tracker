@@ -1,0 +1,17 @@
+*.jpg
+*.png
+*.txt
+*.json
+*.diff
+
+*.avi
+*.mp4
+
+# pytorch/python/numpy formats
+*.pth
+*.pkl
+*.npy
+
+# ipython/jupyter notebooks
+*.ipynb
+**/.ipynb_checkpoints/
