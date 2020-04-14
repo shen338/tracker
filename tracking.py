@@ -10,7 +10,7 @@ print(sys.path)
 from tracking.sot import Tracking
 from reid import REID
 from detection import Detection
-from utils import get_frames, RunningStats, Tracklet, OpticalFlow, Kalman， drawrect
+from utils import get_frames, RunningStats, Tracklet, OpticalFlow, Kalman， drawrect, IOU
 from PIL import Image
 
 from scipy.linalg import block_diag
@@ -130,11 +130,11 @@ for frame in get_frames(video_name):
     
     if flag_lost: 
         search_instance_size = LOST_INSTANCE_SIZE
-        window_influence = WINDOW_INFLUENCE
+        window_influence = LOST_WINDOW_INFLUENCE
         
     else: 
         search_instance_size = INSTANCE_SIZE
-        window_influence = LOST_WINDOW_INFLUENCE
+        window_influence = WINDOW_INFLUENCE
         
     if first_frame:
         
@@ -246,27 +246,7 @@ for frame in get_frames(video_name):
         # cv2.imwrite("test.jpg", frame)
         tboxes, tscores = all_outputs['bbox'], all_outputs['best_score']
         # print(tboxes, tscores)
-        
-        SMOOTH = 1e-6
-        def IOU(boxA, boxB):
-            # determine the (x, y)-coordinates of the intersection rectangle
-            xA = max(boxA[0], boxB[0])
-            yA = max(boxA[1], boxB[1])
-            xB = min(boxA[2], boxB[2])
-            yB = min(boxA[3], boxB[3])
-            # compute the area of intersection rectangle
-            interArea = max(0, xB - xA + 1) * max(0, yB - yA + 1)
-            # compute the area of both the prediction and ground-truth
-            # rectangles
-            boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
-            boxBArea = (boxB[2] - boxB[0] + 1) * (boxB[3] - boxB[1] + 1)
-            # compute the intersection over union by taking the intersection
-            # area and dividing it by the sum of prediction + ground-truth
-            # areas - the interesection area
-            iou = (interArea + SMOOTH) / float(boxAArea + boxBArea - interArea + SMOOTH)
-            # return the intersection over union value
-            return iou
-
+       
         
         for idx, dbox in enumerate(dboxes):
             for tbox in tboxes: 

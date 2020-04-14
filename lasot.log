@@ -1,0 +1,53 @@
+2020-04-13 21:46:23,776 - fvcore.common.checkpoint - INFO - Loading checkpoint from detectron2://COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl
+2020-04-13 21:46:23,777 - fvcore.common.file_io - INFO - URL https://dl.fbaipublicfiles.com/detectron2/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl cached in /home/tong/.torch/fvcore_cache/detectron2/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl
+2020-04-13 21:46:23,978 - fvcore.common.checkpoint - INFO - Reading a file from 'Detectron2 Model Zoo'
+2020-04-13 21:46:24,033 - fvcore.common.checkpoint - INFO - The checkpoint contains parameters not used by the model:
+  [35mproposal_generator.anchor_generator.cell_anchors.{3, 4}[0m
+2020-04-13 21:50:35,561 - root - INFO - Sequence car-14 ECO is: 0.6332504718396378
+2020-04-13 21:50:35,562 - root - INFO - Sequence car-14 Accuracy is : 0.758311345646438
+2020-04-13 22:00:40,346 - root - INFO - Sequence truck-19 ECO is: 0.8439990157016929
+2020-04-13 22:00:40,346 - root - INFO - Sequence truck-19 Accuracy is : 0.9916874480465503
+2020-04-13 22:06:16,721 - root - INFO - Sequence car-20 ECO is: 0.7913435047908272
+2020-04-13 22:06:16,722 - root - INFO - Sequence car-20 Accuracy is : 0.9482242190842961
+2020-04-13 22:09:14,505 - root - INFO - Sequence car-11 ECO is: 0.891831831208603
+2020-04-13 22:09:14,506 - root - INFO - Sequence car-11 Accuracy is : 1.0
+2020-04-13 22:23:21,977 - root - INFO - Sequence airplane-9 ECO is: 0.7816276919145668
+2020-04-13 22:23:21,978 - root - INFO - Sequence airplane-9 Accuracy is : 0.9422180801491147
+2020-04-13 22:28:01,011 - root - INFO - Sequence car-18 ECO is: 0.8163301442539069
+2020-04-13 22:28:01,011 - root - INFO - Sequence car-18 Accuracy is : 0.9158745247148289
+2020-04-13 22:37:06,332 - root - INFO - Sequence car-5 ECO is: 0.8241620978139648
+2020-04-13 22:37:06,332 - root - INFO - Sequence car-5 Accuracy is : 0.9441007040751014
+2020-04-13 22:47:42,004 - root - INFO - Sequence car-19 ECO is: 0.9156390633980781
+2020-04-13 22:47:42,004 - root - INFO - Sequence car-19 Accuracy is : 1.0
+2020-04-13 22:52:32,724 - root - INFO - Sequence motorcycle-7 ECO is: 0.10145804556230438
+2020-04-13 22:52:32,725 - root - INFO - Sequence motorcycle-7 Accuracy is : 0.14111498257839722
+2020-04-13 22:58:19,963 - root - INFO - Sequence racing-20 ECO is: 0.2901734321258935
+2020-04-13 22:58:19,964 - root - INFO - Sequence racing-20 Accuracy is : 0.3650943396226415
+2020-04-13 23:09:15,237 - root - INFO - Sequence racing-18 ECO is: 0.06229648159408637
+2020-04-13 23:09:15,237 - root - INFO - Sequence racing-18 Accuracy is : 0.07864164432529044
+2020-04-13 23:13:09,791 - root - INFO - Sequence motorcycle-9 ECO is: 0.7359537868715561
+2020-04-13 23:13:09,792 - root - INFO - Sequence motorcycle-9 Accuracy is : 0.8839506172839506
+2020-04-13 23:13:55,153 - root - INFO - Sequence airplane-6 ECO is: 0.2667521433801248
+2020-04-13 23:13:55,153 - root - INFO - Sequence airplane-6 Accuracy is : 0.3333333333333333
+2020-04-13 23:29:07,275 - root - INFO - Sequence truck-9 ECO is: 0.6311906799282857
+2020-04-13 23:29:07,276 - root - INFO - Sequence truck-9 Accuracy is : 0.8174748398902104
+2020-04-13 23:44:01,475 - root - INFO - Sequence truck-16 ECO is: 0.5805636959519658
+2020-04-13 23:44:01,476 - root - INFO - Sequence truck-16 Accuracy is : 0.6937092443421558
+2020-04-13 23:47:24,188 - root - INFO - Sequence car-8 ECO is: 0.8107369639178603
+2020-04-13 23:47:24,189 - root - INFO - Sequence car-8 Accuracy is : 1.0
+2020-04-13 23:51:10,180 - root - INFO - Sequence tank-20 ECO is: 0.6964491508287408
+2020-04-13 23:51:10,180 - root - INFO - Sequence tank-20 Accuracy is : 0.8195548489666137
+2020-04-13 23:53:57,821 - root - INFO - Sequence bus-3 ECO is: 0.3132726663988197
+2020-04-13 23:53:57,822 - root - INFO - Sequence bus-3 Accuracy is : 0.3562091503267974
+2020-04-13 23:57:04,595 - root - INFO - Sequence car-4 ECO is: 0.8654706381667492
+2020-04-13 23:57:04,596 - root - INFO - Sequence car-4 Accuracy is : 0.9809210526315789
+2020-04-14 00:02:17,967 - root - INFO - Sequence truck-18 ECO is: 0.7601146439849322
+2020-04-14 00:02:17,968 - root - INFO - Sequence truck-18 Accuracy is : 0.8356958762886598
+2020-04-14 00:12:22,981 - root - INFO - Sequence truck-17 ECO is: 0.25494146986199223
+2020-04-14 00:12:22,982 - root - INFO - Sequence truck-17 Accuracy is : 0.2882924571957427
+2020-04-14 00:21:33,387 - root - INFO - Sequence airplane-11 ECO is: 0.7322800852662267
+2020-04-14 00:21:33,388 - root - INFO - Sequence airplane-11 Accuracy is : 0.9732801595214357
+2020-04-14 00:50:36,745 - root - INFO - Sequence airplane-16 ECO is: 0.7938390418140885
+2020-04-14 00:50:36,746 - root - INFO - Sequence airplane-16 Accuracy is : 0.9787275188551537
+2020-04-14 00:55:19,774 - root - INFO - Sequence car-10 ECO is: 0.7267946128760424
+2020-04-14 00:55:19,774 - root - INFO - Sequence car-10 Accuracy is : 0.8620689655172413
