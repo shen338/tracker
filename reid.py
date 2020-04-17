@@ -13,7 +13,7 @@ class REID(object):
         self.width = width
         
         reid_datamanager = torchreid.data.ImageDataManager(
-            root='../deep-person-reid/car',
+            root='./fake_dataset',
             sources='market1501',
             targets='market1501',
             height=height,
