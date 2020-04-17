@@ -113,3 +113,16 @@ class ModelBuilder(nn.Module):
             outputs['total_loss'] += cfg.TRAIN.MASK_WEIGHT * mask_loss
             outputs['mask_loss'] = mask_loss
         return outputs
+    
+    # the following function is for template updating 
+    def getTemplate(self, z):
+        
+        # Fetch template features, used for tracklets
+        zf = self.backbone(z)
+        if cfg.MASK.MASK:
+            zf = zf[-1]
+        if cfg.ADJUST.ADJUST:
+            zf = self.neck(zf)
+        return zf
+    
+    

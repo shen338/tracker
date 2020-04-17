@@ -47,8 +47,8 @@ class Tracking(object):
         self.tracker.init(frame, init_rect)
         
     def update(self, bbox):
-        ## REMEMBER TO CALL UPDATE
         
+        ## REMEMBER TO CALL UPDATE
         self.tracker.update(bbox)
     
     def get_roi(self, img, instance_size):
@@ -58,4 +58,15 @@ class Tracking(object):
     def track(self, frame, x_crop, scale_z, instance_size):
         # x_crop, scale_z = self.get_roi(frame)
         return self.tracker.track(frame, x_crop, scale_z, instance_size)
+    
+    # Following functions are used for template update
+    def templateFeature(self, z):
+        
+        return model.getTemplate(z)
+    
+    def updateTemplate(self, zf):
+        
+        model.zf = zf
+        
+        
     
