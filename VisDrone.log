@@ -1,5 +1,51 @@
-2020-04-17 05:09:27,136 - fvcore.common.checkpoint - INFO - Loading checkpoint from detectron2://COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl
-2020-04-17 05:09:27,137 - fvcore.common.file_io - INFO - URL https://dl.fbaipublicfiles.com/detectron2/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl cached in /home/tong/.torch/fvcore_cache/detectron2/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl
-2020-04-17 05:09:27,342 - fvcore.common.checkpoint - INFO - Reading a file from 'Detectron2 Model Zoo'
-2020-04-17 05:09:27,399 - fvcore.common.checkpoint - INFO - The checkpoint contains parameters not used by the model:
+2020-04-20 03:40:50,533 - fvcore.common.checkpoint - INFO - Loading checkpoint from detectron2://COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl
+2020-04-20 03:40:50,534 - fvcore.common.file_io - INFO - URL https://dl.fbaipublicfiles.com/detectron2/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl cached in /home/tong/.torch/fvcore_cache/detectron2/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl
+2020-04-20 03:40:50,762 - fvcore.common.checkpoint - INFO - Reading a file from 'Detectron2 Model Zoo'
+2020-04-20 03:40:50,819 - fvcore.common.checkpoint - INFO - The checkpoint contains parameters not used by the model:
   [35mproposal_generator.anchor_generator.cell_anchors.{3, 4}[0m
+2020-04-20 03:43:45,047 - root - INFO - Sequence uav0000126_07915_s EAO is: 0.8749929217922174
+2020-04-20 03:43:45,048 - root - INFO - Sequence uav0000126_07915_s Accuracy is : 1.0
+2020-04-20 03:49:05,615 - root - INFO - Sequence uav0000242_02327_s EAO is: 0.8172313397877595
+2020-04-20 03:49:05,616 - root - INFO - Sequence uav0000242_02327_s Accuracy is : 1.0
+2020-04-20 03:59:00,030 - root - INFO - Sequence uav0000221_10400_s EAO is: 0.4567864912532151
+2020-04-20 03:59:00,031 - root - INFO - Sequence uav0000221_10400_s Accuracy is : 0.6056622851365016
+2020-04-20 04:06:56,458 - root - INFO - Sequence uav0000149_00317_s EAO is: 0.26652679449639727
+2020-04-20 04:06:56,458 - root - INFO - Sequence uav0000149_00317_s Accuracy is : 0.3192307692307692
+2020-04-20 04:10:25,433 - root - INFO - Sequence uav0000199_00000_s EAO is: 0.6741697666519205
+2020-04-20 04:10:25,434 - root - INFO - Sequence uav0000199_00000_s Accuracy is : 0.9009345794392524
+2020-04-20 04:16:02,071 - root - INFO - Sequence uav0000241_00001_s EAO is: 0.8151031682710859
+2020-04-20 04:16:02,072 - root - INFO - Sequence uav0000241_00001_s Accuracy is : 0.9960460100647016
+2020-04-20 04:18:29,398 - root - INFO - Sequence uav0000238_00001_s EAO is: 0.7918496254420894
+2020-04-20 04:18:29,399 - root - INFO - Sequence uav0000238_00001_s Accuracy is : 1.0
+2020-04-20 04:22:59,835 - root - INFO - Sequence uav0000209_00000_s EAO is: 0.2598011610860051
+2020-04-20 04:22:59,836 - root - INFO - Sequence uav0000209_00000_s Accuracy is : 0.3069657615112161
+2020-04-20 04:24:17,495 - root - INFO - Sequence uav0000155_01201_s EAO is: 0.8157117141165892
+2020-04-20 04:24:17,495 - root - INFO - Sequence uav0000155_01201_s Accuracy is : 1.0
+2020-04-20 04:28:39,486 - root - INFO - Sequence uav0000180_00050_s EAO is: 0.46115122621670024
+2020-04-20 04:28:39,486 - root - INFO - Sequence uav0000180_00050_s Accuracy is : 0.6024193548387097
+2020-04-20 04:32:35,033 - root - INFO - Sequence uav0000160_00000_s EAO is: 0.21574303114825308
+2020-04-20 04:32:35,034 - root - INFO - Sequence uav0000160_00000_s Accuracy is : 0.24974358974358973
+2020-04-20 04:34:31,112 - root - INFO - Sequence uav0000239_11136_s EAO is: 0.6872348724065848
+2020-04-20 04:34:31,113 - root - INFO - Sequence uav0000239_11136_s Accuracy is : 0.803125
+2020-04-20 04:38:00,229 - root - INFO - Sequence uav0000303_00000_s EAO is: 0.05056124882690947
+2020-04-20 04:38:00,230 - root - INFO - Sequence uav0000303_00000_s Accuracy is : 0.03666666666666667
+2020-04-20 04:45:24,121 - root - INFO - Sequence uav0000147_00000_s EAO is: 0.14473166013352012
+2020-04-20 04:45:24,122 - root - INFO - Sequence uav0000147_00000_s Accuracy is : 0.1793600721045516
+2020-04-20 04:47:04,842 - root - INFO - Sequence uav0000252_00001_s EAO is: 0.7368453268745151
+2020-04-20 04:47:04,842 - root - INFO - Sequence uav0000252_00001_s Accuracy is : 0.8865710560625815
+2020-04-20 04:50:56,221 - root - INFO - Sequence uav0000164_00000_s EAO is: 0.3689908443097641
+2020-04-20 04:50:56,222 - root - INFO - Sequence uav0000164_00000_s Accuracy is : 0.5112540192926045
+2020-04-20 04:54:13,409 - root - INFO - Sequence uav0000198_00000_s EAO is: 0.1854756343224562
+2020-04-20 04:54:13,410 - root - INFO - Sequence uav0000198_00000_s Accuracy is : 0.2289156626506024
+2020-04-20 04:54:30,791 - root - INFO - Sequence uav0000003_00000_s EAO is: 0.04179018600469635
+2020-04-20 04:54:30,792 - root - INFO - Sequence uav0000003_00000_s Accuracy is : 0.04861111111111111
+2020-04-20 04:56:45,644 - root - INFO - Sequence uav0000205_00000_s EAO is: 0.7870427556559176
+2020-04-20 04:56:45,645 - root - INFO - Sequence uav0000205_00000_s Accuracy is : 1.0
+2020-04-20 04:58:44,750 - root - INFO - Sequence uav0000352_00759_s EAO is: 0.4814939908539907
+2020-04-20 04:58:44,750 - root - INFO - Sequence uav0000352_00759_s Accuracy is : 0.5397301349325337
+2020-04-20 05:00:24,239 - root - INFO - Sequence uav0000348_02415_s EAO is: 0.019760709116271483
+2020-04-20 05:00:24,239 - root - INFO - Sequence uav0000348_02415_s Accuracy is : 0.02332814930015552
+2020-04-20 05:04:29,883 - root - INFO - Sequence uav0000367_04137_s EAO is: 0.36344444684825994
+2020-04-20 05:04:29,884 - root - INFO - Sequence uav0000367_04137_s Accuracy is : 0.4830985915492958
+2020-04-20 05:07:28,458 - root - INFO - Sequence uav0000079_02568_s EAO is: 0.05814731494384243
+2020-04-20 05:07:28,458 - root - INFO - Sequence uav0000079_02568_s Accuracy is : 0.07953667953667953

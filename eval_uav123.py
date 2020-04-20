@@ -23,7 +23,7 @@ import glob
 import logging
 
 #Create and configure logger 
-logging.basicConfig(filename="VisDrone.log", 
+logging.basicConfig(filename="UAV123.log", 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
                     filemode='w') 
 
@@ -47,7 +47,7 @@ logger.setLevel(logging.DEBUG)
 
 parser = argparse.ArgumentParser(description="Necessary parameters for tracking")
 
-parser.add_argument('--data_dir', type=str, default='', help='The directory to LsSOT style sequence')
+parser.add_argument('--data_dir', type=str, default='', help='The directory to UAV123 style sequence')
 parser.add_argument('--config', type=str, default='config.yaml', help='yaml file to provide specific paramters')
 # parser.add_argument('--init_rect', type=str, default='', help='Target object location in the first frame, format is x,y,w,h')
 # parser.add_argument('--output_video', type=str, default='output.avi', help='output video name')
@@ -169,14 +169,18 @@ for folder in folders:
     acc = []
     
     img_path = folder
-    # img_files = glob.glob(img_path)
-    # print(img_path)
+    img_files = glob.glob(img_path + "/*.jpg")
     
-    txt_path = folder[:-1] + ".txt"
-    print(txt_path)
-    
-    with open(txt_path) as f:
-        annotation = f.readlines()
+        
+    filenames = glob.glob(os.path.join(args.data_dir, basename + ".txt")) + glob.glob(os.path.join(args.data_dir, basename + "_*.txt"))
+    print(filenames)
+    filenames = sorted(filenames)
+    annotation = []
+    for filename in filenames:
+        with open(filename) as f:
+            annotation += f.readlines()
+            
+    length = min(len(annotation), len(img_files))
 
     import time 
     for frame in get_frames(img_path):
@@ -188,6 +192,9 @@ for folder in folders:
         # print(frame.shape)
 
         count += 1
+        
+        if count >= length: 
+            continue
         
         if count % 100 == 0:
             
@@ -217,7 +224,7 @@ for folder in folders:
                     
                     distance = np.sqrt(((dboxes[idx][0] + dboxes[idx][2])/2 - center_pos[0])**2 + ((dboxes[idx][1] + dboxes[idx][3])/2 - center_pos[1])**2)
                     scale = max(0, np.cos(np.pi/2 * distance/img_size))
-                    print("scale: ", scale, distance, dscores[idx])
+                    # print("scale: ", scale, distance, dscores[idx])
                     new_score.append(scale*dscores[idx])
                     
                 return new_score
@@ -352,6 +359,7 @@ for folder in folders:
             if not flag_lost: 
                 tracker.tracker.size = np.array([kalman_pred[4], kalman_pred[6]]).clip(min=2).astype(np.float32)
 
+           
             x_crop, scale_z = tracker.get_roi(frame, search_instance_size)
     #         if count == 1338:
     #             cv2.imwrite("result.jpg", np.squeeze(x_crop).transpose(1, 2, 0))
@@ -450,7 +458,6 @@ for folder in folders:
             # print(count, best_score)
             # print(overall_box)
             # if confidence is low than LOST_THRESHOLD, flag_lost = True
-            
             cv2.circle(frame, (int(tracker.tracker.center_pos[0]), int(tracker.tracker.center_pos[1])), 4, (0, 0, 255), -1)
             
             if best_score < LOST_THRESHOLD:
@@ -459,13 +466,17 @@ for folder in folders:
             else:
                 flag_lost = False
                 lost_frame_cout = 0
+               
+            if annotation[count][0] == 'N':
+                iou = 0
+            else: 
                 
-            gt_bbox = list(map(int, annotation[count].split(',')))
-            gt_bbox = [gt_bbox[0], gt_bbox[1], gt_bbox[0] + gt_bbox[2], gt_bbox[1] + gt_bbox[3]]
-#             gt_bbox = [int(x/2) for x in gt_bbox]
-            # print(gt_bbox, best_bbox)
-            iou = IOU(gt_bbox, best_bbox)
-            # print(iou)
+                gt_bbox = list(map(int, annotation[count].split(',')))
+                gt_bbox = [gt_bbox[0], gt_bbox[1], gt_bbox[0] + gt_bbox[2], gt_bbox[1] + gt_bbox[3]]
+    #             gt_bbox = [int(x/2) for x in gt_bbox]
+                # print(gt_bbox, best_bbox)
+                iou = IOU(gt_bbox, best_bbox)
+                # print(iou)
             
             eco.append(iou)
             acc.append(iou > IOU_THRESHOLD)

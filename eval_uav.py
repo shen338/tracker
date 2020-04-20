@@ -23,7 +23,7 @@ import glob
 import logging
 
 #Create and configure logger 
-logging.basicConfig(filename="lasot.log", 
+logging.basicConfig(filename="uav.log", 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
                     filemode='w') 
 
@@ -352,8 +352,6 @@ for folder in folders:
             if not flag_lost: 
                 tracker.tracker.size = np.array([kalman_pred[4], kalman_pred[6]]).astype(np.float32)
 
-            cv2.circle(frame, (int(tracker.tracker.center_pos[0]), int(tracker.tracker.center_pos[1])), 7, (0, 0, 255), -1)
-
             x_crop, scale_z = tracker.get_roi(frame, search_instance_size)
     #         if count == 1338:
     #             cv2.imwrite("result.jpg", np.squeeze(x_crop).transpose(1, 2, 0))
@@ -452,6 +450,9 @@ for folder in folders:
             # print(count, best_score)
             # print(overall_box)
             # if confidence is low than LOST_THRESHOLD, flag_lost = True
+            
+            cv2.circle(frame, (int(tracker.tracker.center_pos[0]), int(tracker.tracker.center_pos[1])), 4, (0, 0, 255), -1)
+            
             if count > 30 and best_score < running_stats.mean() - running_stats.standard_deviation():
                 flag_lost = True
                 lost_frame_count += 1

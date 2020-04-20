@@ -10,7 +10,7 @@ apt install python3
 apt install -y python3-distutils
 apt install -y curl 
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-python get-pip.py
+python3 get-pip.py
 
 pip install torch torchvision
 
@@ -27,11 +27,16 @@ python3 setup.py build_ext --inplace
 cd ../detectron2
 
 pip install cython; pip install -U 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
-python -m pip install -e .
+python3 -m pip install -e .
 
 # install reid module
 cd ../deep-person-reid/
+
 pip install -r requirements.txt
-python setup.py develop
+apt-get install -y libgtk2.0-dev
+python3 setup.py develop
 
 cd ..
+
+# install filterpy
+pip install filterpy

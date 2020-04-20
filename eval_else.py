@@ -23,7 +23,7 @@ import glob
 import logging
 
 #Create and configure logger 
-logging.basicConfig(filename="VisDrone.log", 
+logging.basicConfig(filename="demo.log", 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
                     filemode='w') 
 
@@ -47,10 +47,9 @@ logger.setLevel(logging.DEBUG)
 
 parser = argparse.ArgumentParser(description="Necessary parameters for tracking")
 
-parser.add_argument('--data_dir', type=str, default='', help='The directory to LsSOT style sequence')
+parser.add_argument('--data_dir', type=str, default='', help='The directory to video sequence')
 parser.add_argument('--config', type=str, default='config.yaml', help='yaml file to provide specific paramters')
 # parser.add_argument('--init_rect', type=str, default='', help='Target object location in the first frame, format is x,y,w,h')
-# parser.add_argument('--output_video', type=str, default='output.avi', help='output video name')
 # parser.add_argument('--output_video', type=str, default='output.avi', help='output video name')
 
 args = parser.parse_args()
@@ -144,7 +143,7 @@ def reid_rescore(reid_module, frame, template_features, bboxes, scores):
     similarity = np.dot(template_features, normalized_features.transpose())
     # print(similarity)
     similarity = np.mean(similarity, axis=0)
-    # print(similarity)
+    # print("ReID similarity score: ", similarity)
     # print(similarity.shape)
     
     scores *= np.squeeze(similarity)
@@ -169,15 +168,17 @@ for folder in folders:
     acc = []
     
     img_path = folder
-    # img_files = glob.glob(img_path)
-    # print(img_path)
+    img_files = glob.glob(img_path + "/*.jpg")
     
-    txt_path = folder[:-1] + ".txt"
-    print(txt_path)
+    filenames = glob.glob(os.path.join(args.data_dir, basename + ".txt")) + glob.glob(os.path.join(args.data_dir, basename + "_*.txt"))
+    print(filenames)
+    filenames = sorted(filenames)
+    annotation = []
+    for filename in filenames:
+        with open(filename) as f:
+            annotation += f.readlines()
+            
     
-    with open(txt_path) as f:
-        annotation = f.readlines()
-
     import time 
     for frame in get_frames(img_path):
         
@@ -217,7 +218,7 @@ for folder in folders:
                     
                     distance = np.sqrt(((dboxes[idx][0] + dboxes[idx][2])/2 - center_pos[0])**2 + ((dboxes[idx][1] + dboxes[idx][3])/2 - center_pos[1])**2)
                     scale = max(0, np.cos(np.pi/2 * distance/img_size))
-                    print("scale: ", scale, distance, dscores[idx])
+                    # print("scale: ", scale, distance, dscores[idx])
                     new_score.append(scale*dscores[idx])
                     
                 return new_score
@@ -278,7 +279,7 @@ for folder in folders:
             tracker.init(frame, init_string)
             first_frame = False
             target = frame[init_rect[1]:init_rect[3]+init_rect[1], init_rect[0]:init_rect[2]+init_rect[0], :]
-            # cv2.imwrite("target.jpg", target)
+            cv2.imwrite("target.jpg", target)
             # initialize Optical Flow
             optical_flow = OpticalFlow(target, [init_rect[0], init_rect[1], init_rect[2]+init_rect[0], init_rect[3]+init_rect[1]])
 
@@ -352,19 +353,20 @@ for folder in folders:
             if not flag_lost: 
                 tracker.tracker.size = np.array([kalman_pred[4], kalman_pred[6]]).clip(min=2).astype(np.float32)
 
+            # 
+
             x_crop, scale_z = tracker.get_roi(frame, search_instance_size)
-    #         if count == 1338:
-    #             cv2.imwrite("result.jpg", np.squeeze(x_crop).transpose(1, 2, 0))
             # print(x_crop.shape, scale_z)
 
             center_pos = tracker.tracker.center_pos
+            # logger.info("center_position: " + str(center_pos))
+            
             search_region = [(center_pos - search_instance_size/scale_z/2), (center_pos + search_instance_size/scale_z/2)]
             # print(search_region)
             drawrect(frame, (int(search_region[0][0]), int(search_region[0][1])),
                               (int(search_region[1][0]), int(search_region[1][1])),
                               (0, 255, 0), 2)
 
-            
             x_detection = np.squeeze(np.transpose(x_crop, (0, 2, 3, 1)))
             # print(x_detection.shape, scale_z)
             x_detection = cv2.resize(x_detection, (int(search_instance_size/scale_z), int(search_instance_size/scale_z)))
@@ -377,12 +379,12 @@ for folder in folders:
             center_pos = tracker.tracker.center_pos
 
             # print(tracker.tracker.center_pos, tracker.tracker.size)
-            # print(dboxes, dscores)
+            # print("detection results: ", len(dboxes), dscores)
             # print(x_crop.shape)
             all_outputs = tracker.track(frame, x_crop, scale_z, search_instance_size)
             # cv2.imwrite("test.jpg", frame)
             tboxes, tscores = all_outputs['bbox'], all_outputs['best_score']
-            # print(tboxes, tscores)
+            # print("tracking results: ", tboxes, tscores)
             
             for idx, dbox in enumerate(dboxes):
                 for tbox in tboxes: 
@@ -428,7 +430,7 @@ for folder in folders:
                 tbox[2] += tbox[0]
                 tbox[3] += tbox[1]
 
-            overall_box = np.concatenate((dboxes, tboxes), axis=0).astype(int)
+            overall_box = np.concatenate((dboxes, tboxes), axis=0)
             overall_box[overall_box < 0] = 0
             overall_score = np.concatenate((dscores, tscores), axis=0)
 
@@ -436,23 +438,23 @@ for folder in folders:
             template_features = tracklet.get_features()
             # print(template_features.shape)
             # print(frame.shape, overall_box)
-            after_reid_score, reid_features = reid_rescore(reid_module, frame, template_features, overall_box, overall_score)
+            overall_box_int = overall_box.astype(np.int)
+            after_reid_score, reid_features = reid_rescore(reid_module, frame, template_features, overall_box_int, overall_score)
             # print(after_reid_score)
             best_idx = np.argmax(after_reid_score)
             best_bbox = overall_box[best_idx]
+            best_bbox_int = best_bbox.astype(np.int)
             best_score = after_reid_score[best_idx]
+            # logger.info("Current frame result: " + str(best_bbox))
             running_stats.push(best_score)
-            
+            # tracker.update(best_bbox)
             # Score better than one sigma, treat as key frame 
             if best_score >= running_stats.mean() + running_stats.standard_deviation():
-                tracklet.push_frame(frame[best_bbox[1]:best_bbox[3], best_bbox[0]:best_bbox[2], :], np.squeeze(reid_features[best_idx]))
-
+                tracklet.push_frame(frame[best_bbox_int[1]:best_bbox_int[3], best_bbox_int[0]:best_bbox_int[2], :], np.squeeze(reid_features[best_idx]))
+            
             # print(count, best_score)
             # print(overall_box)
             # if confidence is low than LOST_THRESHOLD, flag_lost = True
-            
-            cv2.circle(frame, (int(tracker.tracker.center_pos[0]), int(tracker.tracker.center_pos[1])), 4, (0, 0, 255), -1)
-            
             if best_score < LOST_THRESHOLD:
                 flag_lost = True
                 lost_frame_count += 1
@@ -460,22 +462,15 @@ for folder in folders:
                 flag_lost = False
                 lost_frame_cout = 0
                 
-            gt_bbox = list(map(int, annotation[count].split(',')))
-            gt_bbox = [gt_bbox[0], gt_bbox[1], gt_bbox[0] + gt_bbox[2], gt_bbox[1] + gt_bbox[3]]
-#             gt_bbox = [int(x/2) for x in gt_bbox]
-            # print(gt_bbox, best_bbox)
-            iou = IOU(gt_bbox, best_bbox)
-            # print(iou)
+            cv2.circle(frame, (int(tracker.tracker.center_pos[0]), int(tracker.tracker.center_pos[1])), 4, (0, 0, 255), -1)
             
-            eco.append(iou)
-            acc.append(iou > IOU_THRESHOLD)
-
             # only update when current result is reliable 
             if not flag_lost: 
                 # update tracker size and position with current best box
                 tracker.update(best_bbox)
                 # print(frame.shape, best_bbox)
-                optical_flow.update(frame[best_bbox[1]:best_bbox[3], best_bbox[0]:best_bbox[2], :], best_bbox)
+                
+                optical_flow.update(frame[best_bbox_int[1]:best_bbox_int[3], best_bbox_int[0]:best_bbox_int[2], :], best_bbox)
                 # cv2.imwrite("result.jpg", frame[best_bbox[1]:best_bbox[3], best_bbox[0]:best_bbox[2], :])
                 # print("kalman update: ", [(best_bbox[0]+best_bbox[2])/2, (best_bbox[1]+best_bbox[3])/2, best_bbox[2] - best_bbox[0], best_bbox[3] - best_bbox[1]])
                 kalman_filter.update([(best_bbox[0]+best_bbox[2])/2, (best_bbox[1]+best_bbox[3])/2, best_bbox[2] - best_bbox[0], best_bbox[3] - best_bbox[1]])
@@ -498,15 +493,13 @@ for folder in folders:
                               (bbox[2], bbox[3]),
                               (255, 0, 0), 2)
 
-            cv2.rectangle(frame, (best_bbox[0], best_bbox[1]),
-                              (best_bbox[2], best_bbox[3]),
+            cv2.rectangle(frame, (best_bbox_int[0], best_bbox_int[1]),
+                              (best_bbox_int[2], best_bbox_int[3]),
                               (255, 255, 0), 2)
+            
+            # cv2.imwrite(str(count) + ".jpg", frame[best_bbox_int[1]:best_bbox_int[3], best_bbox_int[0]:best_bbox_int[2], :])
 
         out.write(frame)
 
     out.release()
-    
-    logger.info("Sequence " + basename + " EAO is: %s" %(np.mean(np.array(eco))))
-    logger.info("Sequence " + basename + " Accuracy is : %s" %(np.mean(np.array(acc))))
-                
     
