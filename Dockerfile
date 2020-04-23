@@ -1,5 +1,11 @@
 FROM nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
 
+# author
+MAINTAINER Tong Shen
+
+# extra metadata
+LABEL description="Tracker environment, include pysot, detectron2, deep-person-reid"
+
 RUN apt update 
 
 RUN apt install git
