@@ -62,7 +62,11 @@ class Tracking(object):
     # Following functions are used for template update
     def templateFeature(self, z):
         
-        return model.getTemplate(z)
+        return self.model.templateFeature(z)
+    
+    def zf(self):
+        
+        return self.model.zf
     
     def updateTemplate(self, zf):
         

@@ -115,7 +115,7 @@ class ModelBuilder(nn.Module):
         return outputs
     
     # the following function is for template updating 
-    def getTemplate(self, z):
+    def templateFeature(self, z):
         
         # Fetch template features, used for tracklets
         zf = self.backbone(z)
@@ -125,4 +125,7 @@ class ModelBuilder(nn.Module):
             zf = self.neck(zf)
         return zf
     
+    def zf(self):
+        
+        return self.zf
     
