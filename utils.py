@@ -15,6 +15,96 @@ from filterpy.kalman import KalmanFilter
 from scipy.linalg import block_diag
 from filterpy.common import Q_discrete_white_noise
 
+def ECC(src, dst, warp_mode = cv2.MOTION_EUCLIDEAN, eps = 1e-5,
+        max_iter = 100, scale = None, align = False):
+    """Compute the warp matrix from src to dst.
+
+    Parameters
+    ----------
+    src : ndarray
+        An NxM matrix of source img(BGR or Gray), it must be the same format as dst.
+    dst : ndarray
+        An NxM matrix of target img(BGR or Gray).
+    warp_mode: flags of opencv
+        translation: cv2.MOTION_TRANSLATION
+        rotated and shifted: cv2.MOTION_EUCLIDEAN
+        affine(shift,rotated,shear): cv2.MOTION_AFFINE
+        homography(3d): cv2.MOTION_HOMOGRAPHY
+    eps: float
+        the threshold of the increment in the correlation coefficient between two iterations
+    max_iter: int
+        the number of iterations.
+    scale: float or [int, int]
+        scale_ratio: float
+        scale_size: [W, H]
+    align: bool
+        whether to warp affine or perspective transforms to the source image
+
+    Returns
+    -------
+    warp matrix : ndarray
+        Returns the warp matrix from src to dst.
+        if motion model is homography, the warp matrix will be 3x3, otherwise 2x3
+    src_aligned: ndarray
+        aligned source image of gray
+    """
+    assert src.shape == dst.shape, "the source image must be the same format to the target image!"
+
+    # BGR2GRAY
+    if src.ndim == 3:
+        # Convert images to grayscale
+        src = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+        dst = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
+
+    # make the imgs smaller to speed up
+    if scale is not None:
+        if isinstance(scale, float) or isinstance(scale, int):
+            if scale != 1:
+                src_r = cv2.resize(src, (0, 0), fx = scale, fy = scale,interpolation =  cv2.INTER_LINEAR)
+                dst_r = cv2.resize(dst, (0, 0), fx = scale, fy = scale,interpolation =  cv2.INTER_LINEAR)
+                scale = [scale, scale]
+            else:
+                src_r, dst_r = src, dst
+                scale = None
+        else:
+            if scale[0] != src.shape[1] and scale[1] != src.shape[0]:
+                src_r = cv2.resize(src, (scale[0], scale[1]), interpolation = cv2.INTER_LINEAR)
+                dst_r = cv2.resize(dst, (scale[0], scale[1]), interpolation=cv2.INTER_LINEAR)
+                scale = [scale[0] / src.shape[1], scale[1] / src.shape[0]]
+            else:
+                src_r, dst_r = src, dst
+                scale = None
+    else:
+        src_r, dst_r = src, dst
+
+    # Define 2x3 or 3x3 matrices and initialize the matrix to identity
+    if warp_mode == cv2.MOTION_HOMOGRAPHY :
+        warp_matrix = np.eye(3, 3, dtype=np.float32)
+    else :
+        warp_matrix = np.eye(2, 3, dtype=np.float32)
+
+    # Define termination criteria
+    criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, max_iter, eps)
+
+    # Run the ECC algorithm. The results are stored in warp_matrix.
+    (cc, warp_matrix) = cv2.findTransformECC (src_r, dst_r, warp_matrix, warp_mode, criteria, None, 1)
+
+    if scale is not None:
+        warp_matrix[0, 2] = warp_matrix[0, 2] / scale[0]
+        warp_matrix[1, 2] = warp_matrix[1, 2] / scale[1]
+
+    if align:
+        sz = src.shape
+        if warp_mode == cv2.MOTION_HOMOGRAPHY:
+            # Use warpPerspective for Homography
+            src_aligned = cv2.warpPerspective(src, warp_matrix, (sz[1],sz[0]), flags=cv2.INTER_LINEAR)
+        else :
+            # Use warpAffine for Translation, Euclidean and Affine
+            src_aligned = cv2.warpAffine(src, warp_matrix, (sz[1],sz[0]), flags=cv2.INTER_LINEAR)
+        return warp_matrix, src_aligned
+    else:
+        return warp_matrix, None
+    
 def get_subwindow(im, pos, model_sz, original_sz, avg_chans):
         """
         args:
@@ -110,37 +200,32 @@ class RunningStats:
 
     def __init__(self):
         self.n = 0
-        self.old_m = 0
-        self.new_m = 0
-        self.old_s = 0
-        self.new_s = 0
+        self.size = 50
+        self.nums = []
 
     def clear(self):
         self.n = 0
+        self.nums = []
 
     def push(self, x):
         self.n += 1
-
-        if self.n == 1:
-            self.old_m = self.new_m = x
-            self.old_s = 0
-        else:
-            self.new_m = self.old_m + (x - self.old_m) / self.n
-            self.new_s = self.old_s + (x - self.old_m) * (x - self.new_m)
-
-            self.old_m = self.new_m
-            self.old_s = self.new_s
+        self.nums.append(x)
+        
+        if self.n > self.size: 
+            self.nums.pop(0)
 
     def mean(self):
-        return self.new_m if self.n else 0.0
+        return np.mean(self.nums) if self.n else 0.0
 
     def variance(self):
-        return self.new_s / (self.n - 1) if self.n > 1 else 0.0
+        return np.var(self.nums) if self.n > 1 else 0.0
 
     def standard_deviation(self):
-        return math.sqrt(self.variance())
+        return np.std(self.nums) if self.n > 1 else 0.0
     
 class Tracklet(object):
+    
+    # Store previous frame results, ids (Re-ID), and features (SiamNets)
     
     def __init__(self, capacity):
         
@@ -148,20 +233,30 @@ class Tracklet(object):
         self.size = 0
         self.frames = []
         self.ids = []
+        self.features = [[], [], []]
 
-    def push_frame(self, frame, current_id):
+    def push_frame(self, frame, current_id, current_feature):
         
         self.size += 1
         self.frames.append(frame)
         self.ids.append(current_id)
         
+        for ii in range(3):
+            self.features[ii].append(current_feature[ii])
+        
         if self.size > self.capacity: 
             self.size -= 1
             self.frames.pop(0)
             self.ids.pop(0)
+            for ii in range(3):
+                self.features[ii].pop(0)
 
-    def get_features(self):
+    def get_ids(self):
         return np.array(self.ids)
+    
+    def get_features(self):
+         return [torch.mean(torch.stack(item), dim=0) for item in self.features]
+        
 
 # Kalman filter for basic motion model 
 class Kalman(object):

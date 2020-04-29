@@ -70,7 +70,7 @@ class Tracking(object):
     
     def updateTemplate(self, zf):
         
-        model.zf = zf
+        self.tracker.zfUpdate(zf)
         
         
     

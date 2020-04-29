@@ -105,6 +105,9 @@ class SiamRPNTracker(SiameseTracker):
             z_crop = z_crop.cuda()
         self.model.template(z_crop)
         
+    def zfUpdate(self, zf):
+        self.model.zf = zf
+        
     def update(self, bbox):
         ## REMEMBER TO CALL UPDATE
         self.center_pos = np.array([(bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2])

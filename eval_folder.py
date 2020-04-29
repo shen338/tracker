@@ -105,6 +105,14 @@ tracklet = Tracklet(TRACKLET_SIZE)
 
 running_stats = RunningStats()
 
+def xywh2xyxy(bbox): 
+    
+    return [bbox[0], bbox[1], bbox[0]+bbox[2], bbox[1]+bbox[3]]
+
+def xyxy2xywh(bbox): 
+    
+    return [bbox[0], bbox[1], bbox[2]-bbox[0], bbox[3]-bbox[1]]
+
 def getTemplateFeature(frame, bbox):
     
     # Crop an examplar image path 
@@ -227,7 +235,7 @@ for frame in get_frames(data_dir):
         # new_scores = np.array(window_penalty(dboxes, dscores, [0, 0], img_size))
 
         # ReID rescore
-        template_features = tracklet.get_features()
+        template_features = tracklet.get_ids()
         after_reid_score, reid_features = reid_rescore(reid_module, frame, template_features, dboxes, new_scores)
 
         best_idx = np.argmax(after_reid_score)
@@ -306,7 +314,7 @@ for frame in get_frames(data_dir):
         # print(target_features.shape)
         normalized_features = target_features / np.sqrt(np.sum(target_features**2, axis=1))[:, np.newaxis]
         # print(np.sum(normalized_features**2, axis=1))
-        tracklet.push_frame(target, np.squeeze(normalized_features))
+        tracklet.push_frame(target, np.squeeze(normalized_features), getTemplateFeature(frame, init_rect))
 
         # initialize 1st order Kalman filter with state [center_x, center_y, w, h] 
         dt = 1
@@ -321,6 +329,7 @@ for frame in get_frames(data_dir):
         nf = getTemplateFeature(frame, init_rect)
         
         print(torch.all(torch.eq(zf[0], nf[0])), torch.all(torch.eq(zf[1], nf[1])), torch.all(torch.eq(zf[2], nf[2])))
+        print(zf[0].shape, zf[1].shape, zf[2].shape)
 
     else:
 
@@ -422,7 +431,7 @@ for frame in get_frames(data_dir):
         overall_score = np.concatenate((dscores, tscores), axis=0)
 
         # Get key frame RE-ID from tracklet
-        template_features = tracklet.get_features()
+        template_features = tracklet.get_ids()
         # print(template_features.shape)
         # print(frame.shape, overall_box)
         overall_box_int = overall_box.astype(np.int)
@@ -436,8 +445,17 @@ for frame in get_frames(data_dir):
         running_stats.push(best_score)
         # tracker.update(best_bbox)
         # Score better than one sigma, treat as key frame 
+        # print(best_score, running_stats.mean(), running_stats.standard_deviation())
         if best_score >= running_stats.mean() + running_stats.standard_deviation():
-            tracklet.push_frame(frame[best_bbox_int[1]:best_bbox_int[3], best_bbox_int[0]:best_bbox_int[2], :], np.squeeze(reid_features[best_idx]))
+            tracklet.push_frame(frame[best_bbox_int[1]:best_bbox_int[3], best_bbox_int[0]:best_bbox_int[2], :], np.squeeze(reid_features[best_idx]), getTemplateFeature(frame, xyxy2xywh(best_bbox_int)))
+            
+            # update tracker template
+            zf = tracker.zf()
+            new_template = tracklet.get_features()
+            print("key frame!")
+            # print(new_template[0].shape, new_template[1].shape, new_template[2].shape)
+            tracker.updateTemplate(new_template)
+            # print(torch.all(torch.eq(tracker.zf()[0], zf[0])), torch.all(torch.eq(tracker.zf()[1], zf[1])), torch.all(torch.eq(tracker.zf()[2], zf[2])))
 
         # print(count, best_score)
         # print(overall_box)
@@ -465,7 +483,8 @@ for frame in get_frames(data_dir):
             # cv2.imwrite("result.jpg", frame[best_bbox[1]:best_bbox[3], best_bbox[0]:best_bbox[2], :])
             # print("kalman update: ", [(best_bbox[0]+best_bbox[2])/2, (best_bbox[1]+best_bbox[3])/2, best_bbox[2] - best_bbox[0], best_bbox[3] - best_bbox[1]])
             kalman_filter.update([(best_bbox[0]+best_bbox[2])/2, (best_bbox[1]+best_bbox[3])/2, best_bbox[2] - best_bbox[0], best_bbox[3] - best_bbox[1]])
-
+            
+            
         # cv2.imwrite(str(count) + ".jpg", frame[best_bbox[1]:best_bbox[3], best_bbox[0]:best_bbox[2], :])
         # print(time.time() - tt)
         for outputs in tboxes:
