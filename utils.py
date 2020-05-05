@@ -94,14 +94,34 @@ def get_frames(video_name):
             else:
                 break
     else:
-        images = glob(os.path.join(video_name, '*.jp*'))
-        images = sorted(images)
+        #raw_path = folder_path +"raw_640_480/"+"[0-9]*.jpeg"
+        folder_path = video_name
+        fields = folder_path.split("/")
+        raw_path = folder_path+fields[-2]+"-" +"[0-9]*.jpeg"
+        #print("raw_path = ", raw_path)
+
+ 
+
+        raw_names = sorted(glob.glob(raw_path), key=lambda x:float(re.findall("([0-9]+?)\.jpeg",x)[0])) 
+        images = raw_names
+        #images = glob(os.path.join(video_name, '*.jp*'))
+        #images = sorted(images)
         # images = sorted(images,
         #                 key=lambda x: int(x.split('/')[-1].split('.')[0]))
         print(images[0:10])
         for img in images:
             frame = cv2.imread(img)
             yield frame
+#     else:
+#         images = glob(os.path.join(video_name, '*.jp*'))
+#         images = sorted(images)
+#         # images = sorted(images,
+#         #                 key=lambda x: int(x.split('/')[-1].split('.')[0]))
+#         print(images[0:10])
+#         for img in images:
+#             frame = cv2.imread(img)
+#             yield frame
+
             
             
 import math
